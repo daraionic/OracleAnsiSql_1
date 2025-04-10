@@ -49,3 +49,38 @@ begin
 end;
 
 undefine numero;
+
+
+
+
+
+------- PEDIR UN NUMERO AL USARIO DEL 1 AL 4
+1.- Primavera
+2.- Verano
+3.- Otoño
+4.- Invierno
+Si nos da otro número, le indicamos que está mal
+
+
+declare
+    v_numero int;
+begin
+    v_numero := &numero;
+    if (v_numero=1) then
+        dbms_output.put_line('Primavera');
+    elsif (v_numero=2) then
+        dbms_output.put_line('Verano');
+    elsif (v_numero=3) then
+        dbms_output.put_line('Otoño');
+    elsif (v_numero=4) then
+        dbms_output.put_line('Invierno');
+    else
+        dbms_output.put_line('Valor Incorrecto: ' || v_numero);
+    end if;
+        dbms_output.put_line('Fin de programa');
+end;
+
+
+
+
+
