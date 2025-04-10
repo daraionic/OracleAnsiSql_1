@@ -79,7 +79,16 @@ end;
 select * from EMP;
 
 declare
-    v_salario emp.salario%type;
+    v_comision int;
 begin
-    v_salario :=
-end;
+    v_comision := &comision;
+    update EMP set SALARIO = SALARIO * 0.05 where comision = v_comision);
+end; MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL
+
+SOLUCION:
+
+DECLARE 
+    V_INCREMENTO NUMBER := 0.05; 
+BEGIN 
+    UPDATE EMP SET SALARIO = SALARIO + (SALARIO * V_INCREMENTO) WHERE COMISION IS NULL; 
+END; 

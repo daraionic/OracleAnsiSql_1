@@ -1,0 +1,51 @@
+---- ESTRUCTURAS
+
+-- DBEMOS COMPROBAR SI UN NUMERO ES POSITIVO O NEGATIVO
+
+declare
+    v_numero int;
+begin
+    -- pedimos el numero al user
+    v_numero := &numero;
+    -- preguntamos por el propio numero
+    if (v_numero >= 0) then
+        dbms_output.put_line('Positivo: ' || v_numero);
+    end if;
+    dbms_output.put_line('Fin de programa');
+end;
+
+undefine numero;
+
+
+declare
+    v_numero int;
+begin
+    -- pedimos el numero al user
+    v_numero := &numero;
+    -- preguntamos por el propio numero
+    if (v_numero >= 0) then
+        dbms_output.put_line('Positivo: ' || v_numero);
+    else
+        dbms_output.put_line('Negativo: ' || v_numero);
+    end if;
+    dbms_output.put_line('Fin de programa');
+end;
+
+
+-- DEBEMOS COMPROBAR SI UN NUMERO ES POSITIVO, NEGATIVO O CERO
+
+declare
+    v_numero int;
+begin
+    v_numero := &numero;
+    if (v_numero > 0) then
+        dbms_output.put_line('Positivo: ' || v_numero);
+    elsif (v_numero = 0) then
+        dbms_output.put_line('Cero: ' || v_numero);
+    else
+        dbms_output.put_line('Negativo: ' || v_numero);
+    end if;
+    dbms_output.put_line('Fin de programa');
+end;
+
+undefine numero;
