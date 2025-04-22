@@ -1,4 +1,4 @@
-------- 04. CURSORES
+------ 04. CURSORES
 
 -- bloque para consulas de acción
 -- insertar un departamento en un bloque pl/sql dinámico
@@ -202,8 +202,6 @@ select * from EMP order by SALARIO DESC;
 -- 2) ¿qué más?
 -- también necesitamos update a ese salario
 
-
-
 declare
     v_salario EMP.SALARIO%TYPE;
 begin
@@ -231,3 +229,97 @@ begin
     where SALARIO = v_minimo_salario;
     dbms_output.put_line('Salario incrementado a '|| SQL%ROWCOUNT || ' empleados');
 end;
+
+--- ESTAMOS HACIENDO OTRO SELECT PARA GUARDAR OTRO DATO:
+
+declare
+    v_minimo_salario EMP.SALARIO%TYPE;
+    v_apellido EMP.APELLIDO%TYPE;
+begin
+    --realizamos una consulta para recuperar el minimo salario
+    select min(SALARIO) into v_minimo_salario from EMP;
+    -- almacemanos la pesona que cobra dicho salario
+    select APELLIDO into v_apellido from EMP 
+    where SALARIO = v_minimo_salario;
+    update EMP set SALARIO = SALARIO + 10000 
+    where SALARIO = v_minimo_salario;
+    dbms_output.put_line('Salario incrementado a '|| SQL%ROWCOUNT || ' empleados. Sr/Sra ' || v_apellido);
+end;
+
+
+---Realizar un codigo PL/SQL donde pediremos el numero, nombre y localidad de un departamento
+-- Si el depto existe, modificamos su nombre y localidad.
+-- Si el depto no existe, lo insertamos.
+
+-- 10, I+D, GIJON
+
+-- 1) ¿Que necesito para esto?
+-- el numero de un depto
+-- 2) ¿que mas?
+-- saber si existe o no
+-- 3) ¿que mas?
+-- si existe, update
+-- si no existe, insert
+
+
+declare
+    v_id DEPT.DEPT_NO%TYPE;
+    v_nombre DEPT.DNOMBRE%TYPE;
+    v_localidad DEPT.LOC%TYPE;
+    v_existe DEPT.DEPT_NO%TYPE;
+    cursor DEPARTAMENTODEPT IS
+    select DEPT_NO from DEPT where DEPT_NO = v_id;
+begin
+    v_id := &iddepartamento;
+    v_nombre := '&nombre';
+    v_localidad := '&localidad';
+    open DEPARTAMENTODEPT;
+    fetch DEPARTAMENTODEPT into v_existe;
+    if (DEPARTAMENTODEPT%found) then
+        dbms_output.put_line ('Update');
+        update DEPT set DNOMBRE = v_nombre, LOC = v_localidad where DEPT_NO = v_id;
+    else
+        dbms_output.put_line ('Insert');
+        insert into DEPT values (v_id, v_nombre, v_localidad);
+    end if;
+    close DEPARTAMENTODEPT;
+end;
+
+undefine iddepartamento;
+undefine nombre;
+undefine localidad;
+
+select * from DEPT;
+
+declare
+    v_id DEPT.DEPT_NO%TYPE;
+    v_nombre DEPT.DNOMBRE%TYPE;
+    v_localidad DEPT.LOC%TYPE;
+    v_existe DEPT.DEPT_NO%TYPE;
+begin
+    v_id := &iddepartamento;
+    v_nombre := '&nombre';
+    v_localidad := '&localidad';
+    select COUNT(DEPT_NO) into v_existe from DEPT
+    where DEPT_NO = v_id;
+    if (v_existe = 0) then
+        dbms_output.put_line ('Insert');
+        insert into DEPT values (v_id, v_nombre, v_localidad);
+    else
+        dbms_output.put_line ('Update');
+        update DEPT set DNOMBRE = v_nombre, LOC = v_localidad where DEPT_NO = v_id;
+    end if;
+end;
+
+
+-- REALIZAR UN CÓDIGO PL/SQL PARA MODIFICAR EL SALARIO DE UN EMPLEADO ARROYO
+-- SI EL EMPLEADO COBRA MÁS DE 250.000, LE BAJAMOS EL SUELDO A 10.000
+-- SINO LE SUBIMOS EL SUELDO A 10.000
+
+declare
+
+begin
+
+end;
+
+
