@@ -419,8 +419,51 @@ end;
 
 --- QUIERO UN BLOQUE PL/SQL QUE NOS MUESTRE LOS DATOS DEL DOCTOR Cajal R.
 
+describe DEPT;
+
 declare
-
+    v_fila DEPT%ROWTYPE;
+    cursor cursor_dept IS
+    select * from DEPT;
 begin
-
+    open cursor_dept;
+    loop
+        fetch cursor_dept into v_fila;
+        exit when cursor_dept%notfound;
+        dbms_output.put_line('ID: ' || v_fila.DEPT_NO 
+        || ', Nombre: ' || v_fila.DNOMBRE 
+        || ', Localidad: ' || v_fila.LOC);
+    end loop;
+    close cursor_dept;
 end;
+
+
+---- USO DEL BUCLE FOR...IN CON CURSORES
+
+-- REALIZAR UN CURSOR PARA MOSTRAR EL APELLIDO, SALARIO Y OFICIO DE EMPLEADOS
+
+/
+declare
+    cursor cursor_emp is
+    select apellido, salario, oficio, salario + comision as total
+    from EMP;
+begin
+    for v_registro in cursor_emp
+    loop
+        dbms_output.put_line ('Apellido ' || v_registro.apellido 
+        || ', Salario: ' || v_registro.apellido 
+        || ', Oficio: ' || v_registro.oficio
+        || ', Total: ' || v_registro.total);
+    end loop;
+end;
+/
+
+declare
+    v_raise number (5);
+begin
+    update EMP set SALARIO = SALARIO + v_raise;
+end;
+
+select * from EMP;
+
+rollback;
