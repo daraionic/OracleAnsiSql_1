@@ -317,9 +317,110 @@ end;
 -- SINO LE SUBIMOS EL SUELDO A 10.000
 
 declare
+    v_salario EMP.SALARIO%TYPE;
+    v_idemp EMP.EMP_NO%TYPE;
+begin
+    select EMP_NO, SALARIO into v_idemp, v_salario from EMP
+    where UPPER(APELLIDO)='ARROYO';
+    if (v_salario > 250000) 
+        then v_salario := v_salario - 10000;
+    else
+        v_salario := v_salario + 10000;
+    end if;
+    update EMP set SALARIO = v_salario
+    where EMP_NO = v_idemp;
+    dbms_output.put_line ('Salario modificado: ' || v_salario);
+end;
+
+rollback;
+
+
+--- Realizar el siguiente cod PL/SQL
+--- Necesitamos modificar el salario de los doctores de LA PAZ
+--- Si la suma salarial superar 1.000.000 bajamos salarios en 10.000
+--- Si la suma salarial no supera el millón, subimos salarios en 10.000
+--- Mostrar el número de filas que hemos modificado (subir o bajar)
+--- Doctores con suerte: 6, Doctores más pobres: 6.
+
+select * from DOCTOR;
+select * from HOSPITAL;
+
+
+ 
+declare
+    v_salario number;
+    v_iddoc DOCTOR.DOCTOR_NO%TYPE;
+begin
+    select sum (DOCTOR.SALARIO) into v_salario from DOCTOR
+    where HOSPITAL_COD = (select HOSPITAL_COD from HOSPITAL where NOMBRE = 'la paz');
+    dbms_output.put_line(v_salario);
+    if (v_salario < 1000000) then 
+        update DOCTOR set SALARIO = SALARIO + 10000
+        where HOSPITAL_COD = (select HOSPITAL_COD from HOSPITAL where NOMBRE = 'la paz');
+        dbms_output.put_line('Doctores con suerte: '|| SQL%ROWCOUNT);
+    else
+        update DOCTOR set SALARIO = SALARIO - 10000
+        where HOSPITAL_COD = (select HOSPITAL_COD from HOSPITAL where NOMBRE = 'la paz');
+        dbms_output.put_line('Doctores más pobres: '|| SQL%ROWCOUNT);
+    end if;
+end;
+
+    select sum (SALARIO) from DOCTOR
+    where HOSPITAL_COD = (select HOSPITAL_COD from HOSPITAL where NOMBRE = 'la paz');
+
+rollback;
+
+-- También podría hacerse
+
+declare
+    v_suma_salarial number;
+begin
+    select sum (DOCTOR.SALARIO) into v_suma_salarial
+    from DOCTOR
+    inner join HOSPITAL
+    on DOCTOR.HOSPITAL_COD = HOSPITAL.HOSPITAL_COD
+    where lower(HOSPITAL.NOMBRE)='la paz';
+    dbms_output.put_line ('Suma salarial La Paz: ' || v_suma_salarial);
+    if v_suma_salarial > 1000000 then
+        update DOCTOR set SALARIO = SALARIO - 10000
+        where HOSPITAL_COD = 
+        (select HOSPITAL_COD from HOSPITAL where UPPER(NOMBRE)='LA PAZ');
+        dbms_output.put_line ('Bajando salarios ' || SQL%ROWCOUNT);
+    else
+        update DOCTOR set SALARIO = SALARIO + 10000
+        where HOSPITAL_COD = 
+        (select HOSPITAL_COD from HOSPITAL where UPPER(NOMBRE)='LA PAZ');
+        dbms_output.put_line ('Doctores ricos ' || SQL%ROWCOUNT);
+    end if;
+end;
+
+-- SOLUCIÓN 2:
+
+declare
+    v_suma_salarial number;
+    v_codigo HOSPITAL.HOSPITAL_COD%TYPE;
+begin
+    select HOSPITAL_COD into v_codigo from HOSPITAL
+    where lower(NOMBRE)='la paz';
+    select sum (SALARIO) into v_suma_salarial
+    from DOCTOR where HOSPITAL_COD = v_codigo;
+    dbms_output.put_line ('Suma salarial La Paz: ' || v_suma_salarial);
+    if v_suma_salarial > 1000000 then
+        update DOCTOR set SALARIO = SALARIO - 10000
+        where HOSPITAL_COD = v_codigo;
+        dbms_output.put_line ('Bajando salarios ' || SQL%ROWCOUNT);
+    else
+        update DOCTOR set SALARIO = SALARIO + 10000
+        where HOSPITAL_COD = v_codigo;
+        dbms_output.put_line ('Doctores ricos ' || SQL%ROWCOUNT);
+    end if;
+end;
+
+
+--- QUIERO UN BLOQUE PL/SQL QUE NOS MUESTRE LOS DATOS DEL DOCTOR Cajal R.
+
+declare
 
 begin
 
 end;
-
-
