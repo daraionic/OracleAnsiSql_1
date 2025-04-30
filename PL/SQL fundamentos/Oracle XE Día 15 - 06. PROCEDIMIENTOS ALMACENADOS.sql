@@ -123,3 +123,46 @@ begin
     sp_dividir_numeros (10, 0);
 end;
 
+
+
+-- REALIZAR UN PROCEDIMIENO PARA INSERTAR UN NUEVO DEPARTAMENTO
+
+create or replace procedure sp_insertardepartamento
+(p_id number, p_nombre varchar2(50), p_localidad varchar2(50))
+as
+begin
+    insert into DEPT values (p_id, p_nombre, p_localidad);
+end;
+
+-- lo crea pero como hay errores, los guarda con errores. es porque no podemos poner la longuitud a los varchar o demas TYPE
+--con longuitud por lo que es mejor sar el %TYPE
+
+create or replace procedure sp_insertardepartamento
+(p_id DEPT.DEPT_NO%TYPE, p_nombre DEPT.DNOMBRE%TYPE, p_localidad DEPT.LOC%TYPE)
+as
+begin
+    insert into DEPT values (p_id, p_nombre, p_localidad);
+end;
+
+-- LLAMADA AL PROCEDIMIENTO
+
+begin
+    sp_insertardepartamento(11, '11', '11');
+    -- NORMALMENE, DENTRO DE LOS PROCEDIMIENTOS DE ACCION SE INCLUYE COMMIT O ROLLBACK SI DIERA UNA EXCEPCION
+    commit;
+end;
+
+select * from DEPT;
+
+rollback;
+
+-- VERSION 2:
+-- REALIZAREMOS UN PROCEDIMINTO PARA INSERTAR UN NUEVO DEPARTAMENTO
+-- GENERAMOS EL ID CON EL MAX AUTOMATICO DENTRO DEL PROCEDURE
+
+create or replace procedure sp_insertardepartamento
+(p_id DEPT.DEPT_NO%TYPE, p_nombre DEPT.DNOMBRE%TYPE, p_localidad DEPT.LOC%TYPE)
+as
+begin
+    insert into DEPT values (p_id, p_nombre, p_localidad);
+end;
