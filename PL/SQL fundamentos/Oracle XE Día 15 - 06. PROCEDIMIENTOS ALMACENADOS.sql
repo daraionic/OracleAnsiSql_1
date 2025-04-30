@@ -125,6 +125,8 @@ end;
 
 
 
+
+
 -- REALIZAR UN PROCEDIMIENO PARA INSERTAR UN NUEVO DEPARTAMENTO
 
 create or replace procedure sp_insertardepartamento
@@ -161,8 +163,98 @@ rollback;
 -- GENERAMOS EL ID CON EL MAX AUTOMATICO DENTRO DEL PROCEDURE
 
 create or replace procedure sp_insertardepartamento
-(p_id DEPT.DEPT_NO%TYPE, p_nombre DEPT.DNOMBRE%TYPE, p_localidad DEPT.LOC%TYPE)
+(p_nombre DEPT.DNOMBRE%TYPE, p_localidad DEPT.LOC%TYPE)
+as
+    v_max_id DEPT.DEPT_NO%TYPE;
+begin
+    --REALIZAMOS EL CURSOR IMPLICITO PARA BUSCAR EL MAX ID
+    select max (DEPT_NO) + 1 into v_max_id from DEPT;
+    insert into DEPT values (v_max_id, p_nombre, p_localidad);
+    -- NORMALMENE, DENTRO DE LOS PROCEDIMIENTOS DE ACCION SE INCLUYE COMMIT O ROLLBACK SI DIERA UNA EXCEPCION
+    commit;
+end;
+
+-- llamada al procedimiento
+
+begin
+    sp_insertardepartamento ('miercoles', 'miercoles');
+    -- NORMALMENE, DENTRO DE LOS PROCEDIMIENTOS DE ACCION SE INCLUYE COMMIT O ROLLBACK SI DIERA UNA EXCEPCION
+    commit;
+end;
+
+
+-- REALIZAR UN PROCEDIMIENTO PARA INCREMENTAR EL SALARIO DE LOS EMPLEADOS POR UN OFICIO.
+-- DEBEMOS ENVIAR EL OFICIO Y EL INCREMENTO.
+
+select * from emp;
+
+create or replace procedure sp_aumentoporoficio
+(p_oficio EMP.OFICIO%TYPE, p_incremento number)
 as
 begin
-    insert into DEPT values (p_id, p_nombre, p_localidad);
+    update EMP set SALARIO = (EMP.SALARIO + p_incremento) where upper (OFICIO) = upper (p_oficio);
 end;
+
+
+begin
+    sp_aumentoporoficio ('PRESIDENTE', 4);
+end;
+
+
+-- NECESITO UN PROCEDIMIENTO PARA INSERTAR UN DOCTOR.
+-- ENVIAMOS TODOS LOS DATOS DEL DOCTOR, EXCEPTO EL ID
+-- DBEMOS RECUPERAR EL MAXIMO ID DE DOCTOR DENTRO DEL PROCEDIMIENTO
+
+select * from DOCTOR;
+
+create or replace procedure sp_nuevo_doctor
+(p_hospital_cod DOCTOR.HOSPITAL_COD%TYPE, p_apellido DOCTOR.APELLIDO%TYPE, p_especialidad DOCTOR.ESPECIALIDAD%TYPE, p_salario DOCTOR.SALARIO%TYPE)
+as
+    v_max_id DOCTOR.DOCTOR_NO%TYPE;
+begin
+    select max (DOCTOR_NO) + 1 into v_max_id from DOCTOR;
+    insert into DOCTOR values (p_hospital_cod, v_max_id, p_apellido, p_especialidad, p_salario);
+    dbms_output.put_line ('Insertados ' || SQL%ROWCOUNT);
+    commit;
+end;
+
+begin
+    sp_nuevo_doctor (19, 'Dario N.', 'Oncologo', 35000);
+end;
+
+
+-- VERSION 2:
+-- NECESITO UN PROCEDIMIENTO PARA INSERTAR UN DOCTOR.
+-- ENVIAMOS TODOS LOS DATOS DEL DOCTOR, EXCEPTO EL D
+-- DEBEMOS RECUPRAR EL MAX ID DE DOCTOR DENTRO DEL PROCEDIMIENTO
+-- ENVIAMOS EL NOMBRE DEL HOSPITAL EN LUGAR DEL ID DEL HOSPITAL
+-- CONTROLAR SI NO EXISTE EL HOSPITAL ENVIADO
+
+select * from HOSPITAL;
+
+select * from DOCTOR;
+
+create or replace procedure sp_nuevo_doctor_2
+(p_hospital_name HOSPITAL.NOMBRE%TYPE, p_apellido DOCTOR.APELLIDO%TYPE, p_especialidad DOCTOR.ESPECIALIDAD%TYPE, p_salario DOCTOR.SALARIO%TYPE)
+as
+    v_max_id DOCTOR.DOCTOR_NO%TYPE;
+    v_hospital_cod DOCTOR.HOSPITAL_COD%TYPE;
+begin
+    select max (DOCTOR_NO) + 1 into v_max_id from DOCTOR;
+    select HOSPITAL_COD into v_hospital_cod from HOSPITAL where lower (NOMBRE) = lower (p_hospital_name);
+    insert into DOCTOR values (v_hospital_cod, v_max_id, p_apellido, p_especialidad, p_salario);
+    dbms_output.put_line ('Insertados ' || SQL%ROWCOUNT);
+    commit;
+exception
+    when no_data_found then
+        dbms_output.put_line ('No existe el hospital ' || p_hospital_name);
+end;
+
+
+begin
+    sp_nuevo_doctor_2 ('marañon', 'Paco N.', 'Oncologo', 35000);
+end;
+
+
+-- PODEMOS UTILIZAR CURSORES EXPLICITOS DENTRO DE LOS PROCEDIMIENTOS
+
