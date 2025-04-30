@@ -256,5 +256,75 @@ begin
 end;
 
 
+
 -- PODEMOS UTILIZAR CURSORES EXPLICITOS DENTRO DE LOS PROCEDIMIENTOS
+
+-- REALIZAR UN PROCEDIMIENTOS PARA MOSTRAR LOS EMPLEADOS DE UN DETERMINADO NÚMERO DE DEPTO.
+
+select * from EMP;
+
+create or replace procedure sp_empleados_dept
+(p_deptno EMP.DEPT_NO%TYPE)
+as
+    cursor cursor_emp is
+    select * from EMP
+    where DEPT_NO = p_deptno;
+begin
+    for v_reg_emp in cursor_emp
+    loop
+        dbms_output.put_line ('Apellido: ' || v_reg_emp.APELLIDO || ', Oficio: ' || v_reg_emp.OFICIO);
+    end loop;
+end;
+
+begin
+    sp_empleados_dept(30);
+end;
+
+-- LOS CURSORES EXPLICITOS (QUE DEVUELVEN MAS DE UN VALOR) NO APARECERÁ ERROR YA QUE SI NO ENCUENTRA ESTARÁ VACIO. LOS UNICOS CURSORES QUE APARECEN LOS ERRORES 
+--SON LOS IMPLICITOS QUE SOLO TIENE QUE DEVOLVER UN VALOR Y APARECERÍA 'TOO MANY ROWS'
+
+---------- parametros de salida
+
+-- VAMOS A RELAIZAR UN PROCEDIMIENTO PARA ENVIAR EL NOMBRE DEL DEPTO Y DEVOLVER EL NUMERO DE DICHO DEPTO.
+
+create or replace procedure sp_numerodepartamento
+(p_nombre DEPT.DNOMBRE%TYPE, p_iddept out DEPT.DEPT_NO%TYPE)
+as
+    v_iddept DEPT.DEPT_NO%TYPE;
+begin
+    select DEPT_NO into v_iddept from DEPT
+    where upper(DNOMBRE) = upper(p_nombre);
+    p_iddept := v_iddept;
+    dbms_output.put_line('El número de departamento es ' || v_iddept);
+end;
+
+begin
+    sp_numerodepartamento ('VENTAS');
+end;
+
+select * from DEPT;
+
+-- NECESITO UN PROCEDIMIENTO PARA INCREMENTAR EN 1 EL SALARIO DE LOS EMPLEADOS DE UN DEPTO.
+-- ENVIAREMOS AL PROCEDIMIENTO EL NOMBRE DEL DEPARTAMENTO.
+
+create or replace procedure sp_incrementar_sal_dept
+(p_nombre DEPT.DNOMBRE%TYPE)
+as
+    v_num DEPT.DEPT_NO%TYPE;
+begin
+    -- recuperareos el id del departamento a partir del nombre
+    -- llamamos al procedimiento de numero para recuperar el numero a partir del nombre
+    -- sp_numerodepartamento
+    -- (p_nombre DEPT.DNOMBRE%TYPE, p_iddept out DEPT.DEPT_NO%TYPE)
+    sp_numerodepartamento (p_nombre, v_num);
+    update EMP set SALARIO = SALARIO + 1
+    where DEPT_NO = v_num;
+    dbms_output.put_line ('Salarios modificados: ' || SQL%ROWCOUNT);
+end;
+
+begin
+    sp_incrementar_sal_dept('ventas');
+end;
+
+
 
