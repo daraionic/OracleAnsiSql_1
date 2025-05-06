@@ -258,8 +258,7 @@ end;
 
 --Necesitamos un paquete con procedimiento para modificar el salario de cada Doctor de forma individual.
 --La modificación de los datos de cada doctor será de forma aleatoria.
---Debemos comprobar el Salario de cada Doctor para ajustar el número aleatorio 
---del incremento.
+--Debemos comprobar el Salario de cada Doctor para ajustar el número aleatorio del incremento.
 --1) Doctor con menos de 200.000: Incremento aleatorio de 500
 --2) Doctor entre de 200.000 y 300.000: Incremento aleatorio de 300
 --3) Doctor mayor a 300.000: Incremento aleatorio de 50
@@ -267,3 +266,4 @@ end;
 update doctor set salario = salario + dbms_random.value(1,50);
 select dbms_random.value(1,50) from DUAL;
 select * from DOCTOR;
+
