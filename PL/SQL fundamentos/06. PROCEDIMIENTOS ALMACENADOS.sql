@@ -298,9 +298,28 @@ begin
     dbms_output.put_line('El número de departamento es ' || v_iddept);
 end;
 
+create or replace procedure sp_numerodepartamento
+(p_nombre DEPT.DNOMBRE%TYPE, p_iddept out DEPT.DEPT_NO%TYPE)
+as
+    v_iddept DEPT.DEPT_NO%TYPE;
 begin
-    sp_numerodepartamento ('VENTAS');
+    select DEPT_NO into v_iddept from DEPT
+    where upper(DNOMBRE) = upper(p_nombre);
+    p_iddept := v_iddept;
+    dbms_output.put_line('El número de departamento es ' || v_iddept);
 end;
+
+begin
+    sp_numerodepartamento ('ventas');
+end;
+
+DECLARE
+    v_iddept DEPT.DEPT_NO%TYPE;    -- Variable para almacenar el número de departamento
+BEGIN
+    -- Llamar al procedimiento pasando el nombre del departamento y la variable de salida
+    sp_numerodepartamento('VENTAS', v_iddept);
+
+END;
 
 select * from DEPT;
 
