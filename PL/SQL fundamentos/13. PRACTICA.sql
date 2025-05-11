@@ -326,6 +326,24 @@ BEGIN
     sp_importe_total_cliente(1);
 END;
 
+----
+ok
+
+create or replace procedure sp_total_pedidos_clientes 
+    (p_idCliente PEDIDOS.ID_CLIENTE%TYPE, 
+    p_total OUT number)
+as
+begin
+    select sum(PRECIO) into p_total from PEDIDOS where ID_CLIENTE = p_idCliente;
+    dbms_output.put_line ('El importe total para el cliente ' || p_idCliente || ': ' || p_total);
+end;
+
+DECLARE
+    v_total NUMBER;
+BEGIN
+    sp_total_pedidos_clientes(1, v_total);
+END;
+
 
 9) 
 
@@ -346,4 +364,227 @@ END sp_datos_nacionalidad;
 
 BEGIN
     sp_datos_nacionalidad(1);
+END;
+
+------------
+
+CREATE OR REPLACE PROCEDURE sp_recuperar_nacionalidad_bandera (
+    p_idNacionalidad NACIONALIDAD.ID_NACIONALIDAD%TYPE, 
+    p_nacionalidad OUT NACIONALIDAD.NACIONALIDAD%TYPE, 
+    p_bandera OUT NACIONALIDAD.BANDERA%TYPE)
+AS
+BEGIN
+    SELECT NACIONALIDAD, BANDERA 
+    INTO p_nacionalidad, p_bandera
+    FROM NACIONALIDAD
+    WHERE ID_NACIONALIDAD = p_idNacionalidad;
+    DBMS_OUTPUT.PUT_LINE('La nacionalidad es: ' || p_nacionalidad || ' La bandera es: ' || p_bandera);
+END;
+
+DECLARE
+    v_nacionalidad NACIONALIDAD.NACIONALIDAD%TYPE;
+    v_bandera NACIONALIDAD.BANDERA%TYPE;
+BEGIN
+    sp_recuperar_nacionalidad_bandera(1, v_nacionalidad, v_bandera);
+END;
+
+10) 
+
+create or replace procedure sp_info_peliculas (p_idPelicula PELICULAS.ID_PELICULA%TYPE)
+as
+    type type_peliculas is record (
+        v_titulo PELICULAS.TITULO%TYPE,
+        v_duracion PELICULAS.DURACION%TYPE,
+        v_precio PELICULAS.PRECIO%TYPE
+    );
+        v_info_pelicula type_peliculas;
+begin
+    select TITULO, DURACION, PRECIO into v_info_pelicula
+    from PELICULAS where ID_PELICULA = p_idPelicula;
+    dbms_output.put_line ('Titulo: ' || v_info_pelicula.v_titulo 
+    || ', Duración: ' || v_info_pelicula.v_duracion 
+    || ', Precio: ' || v_info_pelicula.v_precio);
+end;
+
+BEGIN
+    sp_info_peliculas(1);
+END;
+
+11)
+SET SERVEROUTPUT ON;
+
+
+select * from CLIENTES;
+
+create or replace procedure sp_info_clientes (p_idCliente CLIENTES.ID_CLIENTE%TYPE)
+as
+    v_cliente CLIENTES%ROWTYPE;
+begin
+    select * into v_cliente from CLIENTES where ID_CLIENTE = p_idCliente;
+    dbms_output.put_line ('ID: ' || v_cliente.ID_CLIENTE
+    || ', Nombre: ' || v_cliente.NOMBRE 
+    || ', Dirección: ' || v_cliente.DIRECCION 
+    || ', Email: ' || v_cliente.EMAIL 
+    || ', Código Postal: ' || v_cliente.CPOSTAL 
+    || ', Página web: ' || v_cliente.PAGINA_WEB 
+    || ', Imagen del Cliente: ' || v_cliente.IMAGEN_CLIENTE);
+EXCEPTION
+    when NO_DATA_FOUND then
+    dbms_output.put_line ('No existe un cliente con el ID ' || p_idCliente);
+end;
+
+BEGIN
+    sp_info_clientes(99);
+END;
+
+
+12)
+
+CREATE OR REPLACE PROCEDURE sp_precio_pelicula (
+    p_precio PELICULAS.PRECIO%TYPE
+)
+AS
+    v_precio PELICULAS.PRECIO%TYPE;
+BEGIN
+    SELECT PRECIO
+    INTO v_precio
+    FROM PELICULAS
+    WHERE ID_PELICULA = p_id_y_precio;
+
+    -- Devuelve el precio en el mismo parámetro
+    p_id_y_precio := v_precio;
+
+    DBMS_OUTPUT.PUT_LINE('El precio de la película es: ' || v_precio);
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No se encontró la película con ese ID');
+        p_id_y_precio := NULL;
+END;
+/
+
+-----------
+
+CREATE OR REPLACE PROCEDURE sp_obtener_precio_pelicula (
+    p_idPelicula PELICULAS.ID_PELICULA%TYPE, 
+    p_precio OUT PELICULAS.PRECIO%TYPE)
+AS
+BEGIN
+    SELECT PRECIO
+    INTO p_precio
+    FROM PELICULAS
+    WHERE ID_PELICULA = p_idPelicula;
+    DBMS_OUTPUT.PUT_LINE('El precio de la película con ID ' || p_idPelicula || ' es: ' || p_precio);
+END;
+
+DECLARE
+    v_precio PELICULAS.PRECIO%TYPE;
+BEGIN
+    sp_obtener_precio_pelicula(1, v_precio);
+END;
+
+
+13) 
+
+declare
+    type type_distribuidor is record (
+        v_email DISTRIBUIDORAS.EMAIL%TYPE,
+        v_pagina_web DISTRIBUIDORAS.PAGINA_WEB%TYPE,
+        V_telefono DISTRIBUIDORAS.TELEFONO%TYPE);
+    v_tipo_distribuidor type_distribuidor;
+begin
+    select EMAIL, PAGINA_WEB, TELEFONO into v_tipo_distribuidor
+    from DISTRIBUIDORAS where ID_DISTRIBUIDOR = 1;
+    dbms_output.put_line ('Email: ' || v_tipo_distribuidor.v_email || 
+    ', Página Web: ' || v_tipo_distribuidor.v_pagina_web || 
+    ', Teléfono: ' || v_tipo_distribuidor.v_telefono);
+end;
+
+
+14) 
+
+-- Guardar en un Varray el título de las películas cuyo género sea acción (o el género que tengáis insertado). 
+
+????
+
+15) 
+
+-- Declarar una variable de tipo tabla y guardar los números pares del 1 al 200. Imprimir los valores en pantalla.
+
+DECLARE
+    TYPE t_numeros_pares IS TABLE OF NUMBER;
+    v_numeros_pares t_numeros_pares := t_numeros_pares();
+BEGIN
+    FOR i IN 1..200 LOOP
+        IF MOD(i, 2) = 0 THEN
+            v_numeros_pares.EXTEND;
+            v_numeros_pares(v_numeros_pares.LAST) := i;
+        END IF;
+    END LOOP;
+    FOR i IN 1..v_numeros_pares.COUNT LOOP
+        DBMS_OUTPUT.PUT_LINE('Número par: ' || v_numeros_pares(i));
+    END LOOP;
+END;
+
+
+16) 
+
+-- Crear un procedimiento almacenado que devuelva un ROWTYPE de género pasando como parámetro de entrada el idGenero.
+
+select * from GENEROS;
+
+CREATE OR REPLACE PROCEDURE sp_devuelve_genero (
+    p_idGenero GENEROS.ID_GENERO%TYPE,
+    p_genero OUT GENEROS%ROWTYPE
+)
+AS
+BEGIN
+    SELECT * INTO p_genero
+    FROM GENEROS
+    WHERE ID_GENERO = p_idGenero;
+    DBMS_OUTPUT.PUT_LINE('ID Genero: ' || p_genero.ID_GENERO || ', Nombre Genero: ' || p_genero.GENERO);
+end;
+
+DECLARE
+    v_genero GENEROS%ROWTYPE;
+BEGIN
+    sp_devuelve_genero(4, v_genero);
+end;
+
+17)
+
+-- Usar una sentencia case dentro de un procedimiento almacenado para que nos devuelva de la tabla distribuidoras:
+
+-- SP si el nombre es SONY PICTURES.
+-- BVI si es BUENA VISTA INTERNACIONAL
+-- LF si es  LAUREN FILMS.                                       
+-- WB si es WARNER BROTHERS.
+-- TP si es TRIPICTURES.
+
+-- El procedimiento almacenado tendrá un parámetro de entrada (IdDistribuidor) y nos devolverá el nombre del distribuidor.
+
+CREATE OR REPLACE PROCEDURE sp_codigo_distribuidor (
+    p_idDistribuidor DISTRIBUIDORAS.ID_DISTRIBUIDOR%TYPE,
+    p_codigo OUT VARCHAR2
+)
+AS
+BEGIN
+    SELECT 
+        CASE 
+            WHEN UPPER(DISTRIBUIDOR) = 'SONY PICTURES' THEN 'SP'
+            WHEN UPPER(DISTRIBUIDOR) = 'BUENA VISTA INTERNACIONAL' THEN 'BVI'
+            WHEN UPPER(DISTRIBUIDOR) = 'LAUREN FILMS' THEN 'LF'
+            WHEN UPPER(DISTRIBUIDOR) = 'WARNER BROTHERS' THEN 'WB'
+            WHEN UPPER(DISTRIBUIDOR) = 'TRIPICTURES' THEN 'TP'
+        END
+    INTO p_codigo
+    FROM DISTRIBUIDORAS
+    WHERE ID_DISTRIBUIDOR = p_idDistribuidor;
+    DBMS_OUTPUT.PUT_LINE('Código del distribuidor: ' || p_codigo);
+END;
+
+DECLARE
+    v_codigo VARCHAR2(10);
+BEGIN
+    sp_codigo_distribuidor(1, v_codigo);
 END;

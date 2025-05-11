@@ -100,3 +100,31 @@ begin
     where DNOMBRE = 'bENTAS';
     dbms_output.put_line ('Ventas es el número ' || v_id);
 end;
+
+
+
+Declare 
+
+  codigo dept.dept_no%type; 
+
+begin 
+
+   select dept_no into codigo 
+
+   from dept  
+
+   where dnombre = 'VENTAS'; 
+
+   dbms_output.put_line ('El departamento de Ventas tiene  codigo: '||codigo); 
+
+  exception 
+
+   when TOO_MANY_ROWS then 
+
+              dbms_output.put_line ('Coinciden en nombre varios departamentos'); 
+
+   when OTHERS then 
+
+      dbms_output.put_line (to_char(SQLCODE) || '     ' || SQLERRM); 
+
+end; 
